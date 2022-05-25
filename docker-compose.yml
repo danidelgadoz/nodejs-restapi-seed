@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: nodejs-restapi-seed/postgres
+    build:
+      context: .
+      dockerfile: .docker/postgres.dockerfile
+    ports:
+      - '5432:5432'
+    networks:
+      - nodejs-restapi-seed-network
+    volumes:
+      - nodejs-restapi-seed-db-volume:/var/lib/postgresql/data
+
+  node:
+    image: nodejs-restapi-seed/node
+    build:
+      context: .
+      dockerfile: .docker/node.dockerfile
+    ports:
+      - '3000:3000'
+    networks:
+      - nodejs-restapi-seed-network
+    env_file:
+      - ./.env.example
+    environment:
+      DB_HOST: postgres
+    depends_on:
+      - postgres
+
+networks:
+  nodejs-restapi-seed-network:
+    driver: bridge
+
+volumes:
+  nodejs-restapi-seed-db-volume:
